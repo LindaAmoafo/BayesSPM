@@ -1,0 +1,21 @@
+Package: BayesSPM
+Title: Implementation of SPM analysis using Bayesian Inference
+Version: 0.1.0
+Authors@R: 
+    person("Linda", "Amoafo", , "linda.amoafoa@utah.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-3306-8445"))
+Description: This package conduct SPM analysis for biomedical research using Bayesian Inference, particularly via the Bayes Factor approach.
+License: GPL (>= 2)
+Imports: 
+    BayesFactor,
+    data.table,
+    tidyr,
+    ggplot2,
+    stats
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Suggests: 
+    mvtnorm,
+    testthat (>= 3.0.0)
+RoxygenNote: 7.2.3
+Config/testthat/edition: 3
