@@ -7,17 +7,18 @@
 #' @param time (T x 1)  vector specify the times (% stance)
 #' @param threshold scalar specifying the posterior probability threshold.
 #' @param Q.threshold scalar specifying a less conservative threshold using the Q-value
-#' @param Hypothesis between "alt" and "null" specifying which alternative we are interested in.
+#' @param Hypothesis for specifying which alternative we are interested in, between "alt" and "null".
+#' @param paired logical only used for ttestBF to specify if observations are paired
 #' @examples
-#' Y = mvtnorm::rmvnorm(40,mean=rep(0,50))
-#' grp=rep(c(1,2,3,4),each=10)
-#' time=1:50
+#' Y = mvtnorm::rmvnorm(40,mean=rep(0,10))
+#' grp=rep(c(1,2),each=20)
+#' time=1:10
 #' out <- SPMBayes(Y,group=grp, time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt")
 #' plot(x=out, summary = TRUE) ## Get summary plot
 #' plot(x=out, summary = FALSE) ## Get SPM Map plot
 #'
 #' @export
-SPMBayes <- function(Y,group,time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt"){
+SPMBayes <- function(Y,group,time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt", paired = FALSE){
 
   ## Summaries of the data for preliminary plot
   MEAN   = t(apply(Y, 2,  \(i) {agg <- stats::aggregate(i, list(group), FUN=mean, na.rm=T)
@@ -29,11 +30,22 @@ SPMBayes <- function(Y,group,time, threshold=0.95, Q.threshold=0.05, Hypothesis=
 
   ## Provide SPM posterior maps
   gp <- factor(group)
-  bfi = apply(Y, MARGIN = 2, FUN = function(y){data =data.table::data.table(YY=y,gp=gp)
+
+  ## Two groups
+  if(length(unique(group))==2){
+    bfi = apply(Y, MARGIN = 2, FUN = \(y){data = data.table::data.table(YY=y, gp=group)
+    BayesFactor::ttestBF(formula=YY~gp,data = data, nullInterval = c(-0.20, 0.20), rscale = "medium", paired = paired)})
+    # division of bf(!interval vs 0)/bf(interval vs 0)
+    bft = lapply(bfi, FUN = function(bfi){bfi[2]/bfi[1]})
+    }else{
+
+  bfi = apply(Y, MARGIN = 2, FUN = \(y){data =data.table::data.table(YY=y,gp=gp)
   BayesFactor::anovaBF(YY~gp,data = data, progress = FALSE)}) ## Get the Bayes factor for comparing the groups at each time point.
 
   # division of bf(!interval vs 0)/bf(interval vs 0); but already done in anovaBF
   bft = bfi
+    }
+
   # use a prior odds of 1 (equal probability for H0 and H1)
   prior.odds = lapply(bft, FUN = function(bft){BayesFactor::newPriorOdds(bft, type = "equal")})
   # convert the prior odds to posterior odds and then to posterior probability
@@ -115,7 +127,7 @@ plot.SPMBayes <- function(x, summary = TRUE,  ...) {
   dat <- data.table::data.table(tidyr::pivot_longer(dat0Mean,cols=-c(time), values_to = "Mean"), tidyr::pivot_longer(dat0Sd,cols=-c(time), values_to="SD")[,"SD"])
 
    if(summary){
-     ggplot2::ggplot(data = dat, ggplot2::aes(x = time, y = Mean, color=name), size = 1) +
+     ggplot2::ggplot(data = dat, ggplot2::aes(x = time, y = Mean, color=name), linewidth = 1) +
        ggplot2::geom_line() +
        ggplot2::geom_ribbon(ggplot2::aes(x = time, ymin = Mean - SD, ymax = Mean + SD, fill = name),
                    linetype = 2, alpha = 0.3) +
@@ -126,10 +138,10 @@ plot.SPMBayes <- function(x, summary = TRUE,  ...) {
        ggplot2::theme_linedraw()
    }else{
      ggplot2::ggplot(data = SUMMARY, ggplot2::aes(x = time, y = PPH1)) +
-       ggplot2::geom_line(ggplot2::aes(y = PPH1), colour = "black", size = 1) +
-       ggplot2::geom_hline(yintercept = PPq, size = 0.5, linetype = "dashed") +
-       ggplot2::geom_hline(yintercept = threshold, size = 0.5, linetype = "dashed") +
-       ggplot2::geom_hline(yintercept = Q.threshold, size = 0.5, linetype = "dashed") +
+       ggplot2::geom_line(ggplot2::aes(y = PPH1), colour = "black", linewidth = 1) +
+       ggplot2::geom_hline(yintercept = PPq, linewidth = 0.5, linetype = "dashed") +
+       ggplot2::geom_hline(yintercept = threshold, linewidth = 0.5, linetype = "dashed") +
+       ggplot2::geom_hline(yintercept = Q.threshold, linewidth = 0.5, linetype = "dashed") +
        ggplot2::annotate("text", x = 10, y = Q.threshold-0.01, label = paste0("Q <", round(Q.threshold,2))) +
        ggplot2::annotate("text", x = 10, y = threshold+0.02, label =  paste("P(H1 | data) > ", threshold, sep="")) +
        ggplot2::annotate("text", x = 10, y = 0.00, label =  paste("P(H0 | data) > ", threshold, sep="")) +

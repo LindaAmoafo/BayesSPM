@@ -11,7 +11,8 @@ SPMBayes(
   time,
   threshold = 0.95,
   Q.threshold = 0.05,
-  Hypothesis = "alt"
+  Hypothesis = "alt",
+  paired = FALSE
 )
 
 \method{plot}{SPMBayes}(x, summary = TRUE, ...)
@@ -27,7 +28,9 @@ SPMBayes(
 
 \item{Q.threshold}{scalar specifying a less conservative threshold using the Q-value}
 
-\item{Hypothesis}{between "alt" and "null" specifying which alternative we are interested in.}
+\item{Hypothesis}{for specifying which alternative we are interested in, between "alt" and "null".}
+
+\item{paired}{logical only used for ttestBF to specify if observations are paired}
 
 \item{x}{Summary object of class \code{SPMBayes}.}
 
@@ -39,9 +42,9 @@ SPMBayes(
 An R-package for conducting Bayesian SPM Analysis
 }
 \examples{
-Y = mvtnorm::rmvnorm(40,mean=rep(0,50))
-grp=rep(c(1,2,3,4),each=10)
-time=1:50
+Y = mvtnorm::rmvnorm(40,mean=rep(0,10))
+grp=rep(c(1,2),each=20)
+time=1:10
 out <- SPMBayes(Y,group=grp, time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt")
 plot(x=out, summary = TRUE) ## Get summary plot
 plot(x=out, summary = FALSE) ## Get SPM Map plot
