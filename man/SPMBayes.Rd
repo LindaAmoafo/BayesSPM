@@ -38,6 +38,9 @@ SPMBayes(
 
 \item{...}{Further arguments passed to ggplot2}
 }
+\value{
+A list containing summaries(mean and SD) of the data at each time point with the posterior probability threshold and q-value threshold
+}
 \description{
 An R-package for conducting Bayesian SPM Analysis
 }

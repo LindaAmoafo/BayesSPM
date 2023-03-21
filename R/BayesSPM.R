@@ -1,7 +1,7 @@
 #' -SPMBayes-
 #'
 #' An R-package for conducting Bayesian SPM Analysis
-#'
+#' @return A list containing summaries(mean and SD) of the data at each time point with the posterior probability threshold and q-value threshold
 #' @param Y  (J x T) array specifying observations for T time points.
 #' @param group (J x 1) factor vector specify the groups to which each observation belongs.
 #' @param time (T x 1)  vector specify the times (% stance)
@@ -142,9 +142,9 @@ plot.SPMBayes <- function(x, summary = TRUE,  ...) {
        ggplot2::geom_hline(yintercept = PPq, linewidth = 0.5, linetype = "dashed") +
        ggplot2::geom_hline(yintercept = threshold, linewidth = 0.5, linetype = "dashed") +
        ggplot2::geom_hline(yintercept = Q.threshold, linewidth = 0.5, linetype = "dashed") +
-       ggplot2::annotate("text", x = 10, y = Q.threshold-0.01, label = paste0("Q <", round(Q.threshold,2))) +
-       ggplot2::annotate("text", x = 10, y = threshold+0.02, label =  paste("P(H1 | data) > ", threshold, sep="")) +
-       ggplot2::annotate("text", x = 10, y = 0.00, label =  paste("P(H0 | data) > ", threshold, sep="")) +
+       ggplot2::annotate("text", x = 30, y = PPq-0.05, label = paste0("Q <", round(Q.threshold,2))) +
+       ggplot2::annotate("text", x = 30, y = threshold+0.02, label =  paste("P(H1 | data) > ", threshold, sep="")) +
+       ggplot2::annotate("text", x = 30, y = 0.00, label =  paste("P(H0 | data) > ", threshold, sep="")) +
        ggplot2::geom_ribbon(data = subset(SUMMARY, tH1c), ggplot2::aes(ymin = threshold, ymax = PPH1),
                    fill = "gray", alpha = 0.4) +
        ggplot2::geom_ribbon(data = subset(SUMMARY, tH1c), ggplot2::aes(ymin = PPq, ymax = PPH1),
@@ -158,3 +158,4 @@ plot.SPMBayes <- function(x, summary = TRUE,  ...) {
    }
 
 }
+

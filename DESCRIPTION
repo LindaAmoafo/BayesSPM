@@ -14,7 +14,8 @@ Imports:
     stats
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-Suggests: 
+Suggests:
+    kableExtra,
     knitr,
     mvtnorm,
     rmarkdown,
@@ -22,3 +23,4 @@ Suggests:
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+LazyData: true

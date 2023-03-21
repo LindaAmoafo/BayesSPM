@@ -2,7 +2,9 @@
 title: "Using BayesSPM to conduct Statistical parametric mapping of bio-mechanical data with Bayesian inference"
 author: "Linda Amoafo"
 date: 3/14/2023
-format: gfm
+format: 
+   html:
+    toc: true
 bibliography: reference.bib
 editor: visual
 vignette: >
