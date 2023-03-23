@@ -2,6 +2,7 @@
 
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/UofUEpiBio/BayesSPM/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/UofUEpiBio/BayesSPM/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The BayesSPM package helps to implement SPM analysis for 2 groups and multiple groups using Bayesian inference, particularly the Bayes factor approach in the Bayesian school of thoughts.
