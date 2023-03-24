@@ -1,1 +1,6 @@
 .Rproj.user
+
+# Files we don't want
+*.tar.gz
+*_cache
+*.Rcheck
