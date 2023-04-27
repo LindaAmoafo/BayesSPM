@@ -33,7 +33,7 @@ time=1:50
 
 ``` r
 library(BayesSPM)
-out <- SPMBayes(Y,group=grp, time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt")
+out<- SPMBayes(Y,group=grp, time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt")
 head(summary(out))
 ```
 
