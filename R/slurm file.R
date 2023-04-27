@@ -5,7 +5,9 @@
 # Model parameters
 nsims <- 1e3
 
-install_github
+devtools::install_github("LindaAmoafo/BayesSPM")
+library(BayesSPM)
+
 # Function to simulate data
 Sim.Func <- function(i, True_beta=NULL){
   grp=rep(c(0,1,2),each=20)

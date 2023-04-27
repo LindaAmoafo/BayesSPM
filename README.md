@@ -34,6 +34,7 @@ time=1:50
 ``` r
 library(BayesSPM)
 out <- SPMBayes(Y,group=grp, time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt")
+head(summary(out))
 ```
 
     ## No significance at the specified Q-value setting to a Q-value = 0.3154751 that has at least 1 significant timepoint
