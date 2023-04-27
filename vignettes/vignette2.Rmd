@@ -1,0 +1,94 @@
+---
+title: "Simulation Analysis with BayesSPM to check for Power and False Discovery Rate"
+author: "Linda Amoafo"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+bibliography: reference.bib
+vignette: >
+  %\VignetteIndexEntry{Simulation Analysis with BayesSPM to check for Power and False Discovery Rate}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+Simulate time series of 10 time samples each. The smooth unit Gaussian random trajectories but with bursts at t = 5 and t = 7.
+
+```{r}
+set.seed(1)
+grp=rep(c(0,1,2),each=20)
+grp.matrix <- model.matrix(~factor(grp))
+True_beta <- c(0.5,1.5,2.5)
+time=1:10
+
+Y <- matrix(NA, nrow=60, ncol=length(time))
+for(i in 1:length(time)){
+  if (i==5|i ==7){
+    Y[,i] = rnorm(60, mean=grp.matrix %*% True_beta, sd=0.5)
+  }else{Y[,i] = rnorm(60, mean=0, sd=0.5)}
+}
+
+colnames(Y) <- paste("Time", 1:10)
+
+dat <- data.frame(grp, Y) |> tidyr::pivot_longer(cols=Time.1:Time.10) 
+dat$name <- factor(dat$name, levels=paste("Time.", 1:10, sep=""), labels=paste("Time", 1:10))
+
+
+ggplot2::ggplot(dat, ggplot2::aes(x=value))+
+  ggplot2::geom_histogram(ggplot2::aes(y=ggplot2::after_stat(density),  fill=factor(grp)), alpha=0.5)+
+  ggplot2::geom_density(ggplot2::aes(y=ggplot2::after_stat(density),  col=factor(grp)), alpha=.2) +
+  ggplot2::facet_wrap(.~name, scale="free")+
+  ggplot2::theme_bw()
+```
+
+
+## Simulations
+```{r}
+
+Sim.Func <- function(i, True_beta=NULL){
+   grp=rep(c(0,1,2),each=20)
+   grp.matrix <- model.matrix(~factor(grp))
+   if(is.null(True_beta)){True_beta <- c(0.5,1.5,2.5)}
+   time=1:10
+   
+   Y <- matrix(NA, nrow=60, ncol=length(time))
+   for(i in 1:length(time)){
+  if (i==5|i ==7){
+    Y[,i] = rnorm(60, mean=grp.matrix %*% True_beta, sd=0.5)
+  }else{Y[,i] = rnorm(60, mean=0, sd=0.5)}
+   }
+   out <- SPMBayes(Y,group=grp, time, threshold=0.95, Q.threshold=0.05, Hypothesis="alt")
+   
+   list(PPH1=summary(out)$PPH1, QH1=summary(out)$QH1)
+}
+
+
+```
+
+```{r}
+# Model parameters
+nsims  <- 1e3
+ncores <- 4L
+
+# Setting up slurmR
+library(slurmR) # This also loads the parallel package
+
+# Making the cluster, and exporting the variables
+cl <- makeSlurmCluster(ncores, account="notchpeak")
+
+# Approximation
+clusterExport(cl, c("Sim.Func"))
+ans <- parSapply(cl, 1:nsims, Sim.Func)
+
+# Closing connection
+stopCluster(cl)
+
+saveRDS(ans, "03-parsapply-slurmr.rds")
+```
+
+

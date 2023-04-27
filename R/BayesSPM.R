@@ -112,7 +112,7 @@ SPMBayes <- function(Y,group,time, threshold=0.95, Q.threshold=0.05, Hypothesis=
 
 
 #' @rdname SPMBayes
-#' @param x Summary object of class \code{SPMBayes}.
+#' @param x object of class \code{SPMBayes}.
 #' @param summary Logical stating whether to only give summary plot with mean and standad deviation
 #' @param ... Further arguments passed to ggplot2
 #'
@@ -157,5 +157,14 @@ plot.SPMBayes <- function(x, summary = TRUE,  ...) {
        ggplot2::theme_linedraw()
    }
 
+}
+
+#' @rdname SPMBayes
+#' @param object object of class \code{SPMBayes}.
+#' @param ... Further arguments passed to ggplot2
+#'
+#' @export
+summary.SPMBayes <- function(object, ...) {
+  object$SUMMARY
 }
 

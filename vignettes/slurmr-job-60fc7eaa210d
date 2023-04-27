@@ -1,0 +1,10 @@
+#!/bin/sh
+#SBATCH --ntasks=4
+#SBATCH --output="C:\Users\u1271266\OneDrive - University of Utah\Books\Spring 2023\PHS 7045\SPMR-package\BayesSPM\vignettes/slurmr-job-60fc7eaa210d.out"
+#SBATCH --account=notchpeak
+#SBATCH --time=01:00:00
+#SBATCH --job-name=slurmr-job-60fc232363e8
+
+echo ==start-hostnames==
+srun hostname
+sleep infinity

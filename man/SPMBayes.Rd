@@ -3,6 +3,7 @@
 \name{SPMBayes}
 \alias{SPMBayes}
 \alias{plot.SPMBayes}
+\alias{summary.SPMBayes}
 \title{-SPMBayes-}
 \usage{
 SPMBayes(
@@ -16,6 +17,8 @@ SPMBayes(
 )
 
 \method{plot}{SPMBayes}(x, summary = TRUE, ...)
+
+\method{summary}{SPMBayes}(object, ...)
 }
 \arguments{
 \item{Y}{(J x T) array specifying observations for T time points.}
@@ -32,11 +35,13 @@ SPMBayes(
 
 \item{paired}{logical only used for ttestBF to specify if observations are paired}
 
-\item{x}{Summary object of class \code{SPMBayes}.}
+\item{x}{object of class \code{SPMBayes}.}
 
 \item{summary}{Logical stating whether to only give summary plot with mean and standad deviation}
 
 \item{...}{Further arguments passed to ggplot2}
+
+\item{object}{object of class \code{SPMBayes}.}
 }
 \value{
 A list containing summaries(mean and SD) of the data at each time point with the posterior probability threshold and q-value threshold
