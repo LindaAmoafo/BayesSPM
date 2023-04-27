@@ -70,25 +70,4 @@ Sim.Func <- function(i, True_beta=NULL){
 
 ```
 
-```{r}
-# Model parameters
-nsims  <- 1e3
-ncores <- 4L
-
-# Setting up slurmR
-library(slurmR) # This also loads the parallel package
-
-# Making the cluster, and exporting the variables
-cl <- makeSlurmCluster(ncores, account="notchpeak")
-
-# Approximation
-clusterExport(cl, c("Sim.Func"))
-ans <- parSapply(cl, 1:nsims, Sim.Func)
-
-# Closing connection
-stopCluster(cl)
-
-saveRDS(ans, "03-parsapply-slurmr.rds")
-```
-
 
