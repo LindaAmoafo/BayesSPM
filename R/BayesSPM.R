@@ -147,8 +147,8 @@ plot.SPMBayes <- function(x, summary = TRUE,  ...) {
        ggplot2::annotate("text", x = 30, y = 0.00, label =  paste("P(H0 | data) > ", threshold, sep="")) +
        ggplot2::geom_ribbon(data = subset(SUMMARY, tH1c), ggplot2::aes(ymin = threshold, ymax = PPH1),
                    fill = "gray", alpha = 0.4) +
-       ggplot2::geom_ribbon(data = subset(SUMMARY, tH1c), ggplot2::aes(ymin = PPq, ymax = PPH1),
-                   fill = "gray", alpha = 0.4) +
+       #ggplot2::geom_ribbon(data = subset(SUMMARY, tH1c), ggplot2::aes(ymin = PPq, ymax = PPH1),
+        #           fill = "gray", alpha = 0.4) +
        ggplot2::ylim(0,1) +
        ggplot2::ylab("posterior probability") +
        ggplot2::xlab("time (%)") +
