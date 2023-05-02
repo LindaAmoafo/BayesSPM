@@ -27,7 +27,6 @@ This is a basic example which shows you how to solve a common problem:
 Y = mvtnorm::rmvnorm(40,mean=rep(0,50))
 grp=rep(c(1,2,3,4),each=10)
 time=1:50
-t
 ```
 
 **Run the SPMBayes function**

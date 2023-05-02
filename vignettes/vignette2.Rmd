@@ -17,20 +17,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
+# Introduction
+
+This is a second vignette run some simulations for the BayesSPM using the conservative threshold and the less conservative threshold. False Dicsovery Rates and Power are compared here. 
+
+# Simulation Design 
+
 Simulate time series of 10 time samples each. The smooth unit Gaussian random trajectories but with bursts at t = 5 and t = 7.
 
 ```{r}
 set.seed(1)
 grp=rep(c(0,1,2),each=20)
 grp.matrix <- model.matrix(~factor(grp))
-True_beta <- c(0.5,1.5,2.5)
+True_beta <- c(0.2,1,0.5)
 time=1:10
 
 Y <- matrix(NA, nrow=60, ncol=length(time))
 for(i in 1:length(time)){
   if (i==5|i ==7){
-    Y[,i] = rnorm(60, mean=grp.matrix %*% True_beta, sd=0.5)
-  }else{Y[,i] = rnorm(60, mean=0, sd=0.5)}
+    Y[,i] = rnorm(60, mean=grp.matrix %*% True_beta, sd=0.3)
+  }else{Y[,i] = rnorm(60, mean=0, sd=0.3)}
 }
 
 colnames(Y) <- paste("Time", 1:10)
@@ -44,10 +50,15 @@ ggplot2::ggplot(dat, ggplot2::aes(x=value))+
   ggplot2::geom_density(ggplot2::aes(y=ggplot2::after_stat(density),  col=factor(grp)), alpha=.2) +
   ggplot2::facet_wrap(.~name, scale="free")+
   ggplot2::theme_bw()
+
+
+graphics::matplot(t(Y), type = "l", col = matrix(grp+1, nrow=1))
+
+
 ```
 
 
-## Simulations
+## Simulations function
 ```{r}
 
 Sim.Func <- function(i, True_beta=NULL){
@@ -68,6 +79,68 @@ Sim.Func <- function(i, True_beta=NULL){
 }
 
 
+
 ```
+
+
+Output for this simulation was obtained from the high performance computer using the slurmR package.
+The full path of the slurmfile.R and slurmfile.slurm files, which is included in the R package under:
+inst/slurm_scripts/slurmfile.R and inst/slurm_scripts/slurmfile.slurm respectively. 
+
+Here is how to access path for you,
+
+```{r}
+fn.slurm <- system.file(
+  file.path("slurm_scripts", "slurmfile.slurm"),
+  package = "BayesSPM"
+  )
+
+# fn.slurm now has the FULL PATH to the myfile.slurm file.
+fn.slurm
+
+
+fn.R <- system.file(
+  file.path("slurm_scripts", "slurmfile.R"),
+  package = "BayesSPM"
+  )
+
+# fn.slurm now has the FULL PATH to the myfile.slurm file.
+fn.R
+```
+
+# Simulation Output Results
+
+```{r}
+SimBayesSPM <- readRDS("C:/Users/u1271266/OneDrive - University of Utah/Books/Spring 2023/PHS 7045/SPMR-package/BayesSPM/SimBayesSPM.rds")
+
+PPH1.dat <- data.table::data.table(do.call(rbind,lapply(SimBayesSPM, "[[", "PPH1"))) |> 
+  dplyr::mutate_all(.funs= \(x) x > 0.95) 
+
+PPH1 <-   PPH1.dat |> dplyr::summarize_all(mean)  |> 
+  tidyr::pivot_longer(cols=V1:V10, names_to = "Time", values_to = "Power") |> 
+  dplyr::mutate(Time=as.numeric(factor(Time, levels=c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10"), labels=1:10)),Threshold="Conservative")
+
+QH1.dat <- data.table::data.table(do.call(rbind,lapply(SimBayesSPM, "[[", "QH1"))) |> 
+  dplyr::mutate_all(.funs= \(x) x < 0.05) 
+
+QH1 <- QH1.dat |> dplyr::summarize_all(mean) |> 
+  tidyr::pivot_longer(cols=V1:V10, names_to = "Time", values_to = "Power") |> 
+  dplyr::mutate(Time=as.numeric(factor(Time, levels=c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10"), labels=1:10)), Threshold="Less Conservative")
+
+
+ggplot2::ggplot(dplyr::bind_rows(PPH1, QH1), ggplot2::aes(y=Power, x=Time, color=Threshold)) +
+  ggplot2::geom_line()+
+  ggplot2::geom_hline(yintercept=0.8, linetype="dashed") +
+  ggplot2::annotate("text", x = 4.5, y = 0.9, label =  paste("Conservative FDR = ", round(mean(as.matrix(PPH1.dat[,-c("V2","V7")])),3) , sep=""))+
+  ggplot2::annotate("text", x = 4.5, y = 0.95, label =  paste("Less Conservative FDR = ", round(mean(as.matrix(PPH1.dat[,-c("V2","V7")])), 3) , sep="")) +
+  ggplot2::theme_bw()
+
+```
+
+
+
+
+
+
 
 
